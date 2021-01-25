@@ -36,11 +36,12 @@ class Cell:
 class Field:
     @staticmethod
     def generate_field(size):
+        _seed = random.randint(1, 0xffffff)
         field = [[0 for i in range(size)] for i in range(size)]
         for y in range(size):
             for x in range(size):
                 v = int((noise.pnoise3(float(x + 50) * 0.3, float(y + 50) * 0.3,
-                                       random.randint(1, 0xffffff)) + 1) * 128)
+                                       _seed) + 1) * 128)
                 typ = CELL_TYPES[0]
                 for num, (val, cell_type) in enumerate(CELL_TYPES):
                     if v < val:
