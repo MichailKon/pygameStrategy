@@ -64,3 +64,7 @@ class Cell:
                 self._sc.blit(self._image[self._typ], (x * 70, y * 70))
             else:
                 self._sc.blit(self._image['f'], (x * 70, y * 70))
+
+    @property
+    def typ(self):
+        return self._typ
