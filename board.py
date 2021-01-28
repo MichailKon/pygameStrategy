@@ -11,13 +11,13 @@ _image = {'w': load_image('water.bmp'), 'g': load_image(
 
 class Cell:
     def __init__(self, x, y, typ, screen, visible_for_first=0, visible_for_second=0,
-                 private=0, buildings=[], unit=None, tree_coefficient=0, ):
+                 private=0, building=None, unit=None, tree_coefficient=0):
         self.sc = screen
         self.typ = typ
         self.coords = x, y
         self.visible = visible_for_first * 2 + visible_for_second
         self.private = private
-        self.buildings = buildings
+        self.building = building
 
     def draw(self, player):
         x, y = self.coords
@@ -75,3 +75,6 @@ class Field:
         for i in range(self.sz):
             for j in range(self.sz):
                 self.long_matrix[i][j].draw(cur_player)
+
+    def __getitem__(self, x, y) -> Cell:
+        return self.long_matrix[x][y]
