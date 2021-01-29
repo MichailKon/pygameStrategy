@@ -22,7 +22,7 @@ class Cell:
 
     @property
     def coords(self):
-        return self.coords
+        return self._coords
 
     @property
     def x(self):
