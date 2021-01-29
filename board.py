@@ -40,6 +40,10 @@ class Field:
                 self.long_matrix[i][j].set_visible(3 if god_mode else 0)
         self.cur = 0  # количество ходов с начала игры
 
+    def __getitem__(self, tup):
+        x, y = tup
+        return self.long_matrix[x][y]
+
     def debug_print(self):
         print(self.cur)
         for i in self.short_matrix:

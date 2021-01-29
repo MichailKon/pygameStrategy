@@ -1,12 +1,10 @@
 import pygame
+from board import Field
 
 pygame.init()
 sc = pygame.display.set_mode((800, 700))
-
-from board import Field
-
-# pygame.init()
-
+in_step = [2, 2]
+cur_money = [5, 5]
 
 field = Field(10, sc, god_mode=1)
 field.debug_print()

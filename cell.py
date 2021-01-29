@@ -3,7 +3,7 @@ from useful_funcs import load_image
 
 class Cell:
     def __init__(self, x=0, y=0, typ='', screen=None, visible_for_first=0, visible_for_second=0,
-                 private=0, building=None, unit=None, tree_coefficient=0):
+                 private=None, building=None, unit=None, tree_coefficient=0):
         self._image = {'w': load_image('water.bmp'), 'g': load_image('grass.bmp'),
                        'c': load_image('climbs.bmp'), 's': load_image('sand.bmp'), 'f': load_image('fog.bmp')}
 
