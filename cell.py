@@ -1,9 +1,10 @@
 from useful_funcs import load_image
+from constants import FIRST_PLAYER, SECOND_PLAYER
 
 
 class Cell:
     def __init__(self, x=0, y=0, typ='', screen=None, visible_for_first=0, visible_for_second=0,
-                 private=None, building=None, unit=None, tree_coefficient=0):
+                 private=None, building=None, unit=None, tree_coefficient=0, cell_size=64):
         self._image = {'w': load_image('water.bmp'), 'g': load_image('grass.bmp'),
                        'c': load_image('climbs.bmp'), 's': load_image('sand.bmp'), 'f': load_image('fog.bmp')}
 
@@ -15,6 +16,7 @@ class Cell:
         self._building = building
         self._unit = unit
         self._tree_coefficient = tree_coefficient
+        self._cell_size = cell_size
 
     @property
     def private(self):
@@ -40,6 +42,10 @@ class Cell:
     def visible(self):
         return self._visible
 
+    @property
+    def building(self):
+        return self._building
+
     def set_unit(self, unit):
         self._unit = unit
 
@@ -54,16 +60,18 @@ class Cell:
 
     def draw(self, player):
         x, y = self.coords
-        if player == 0:
-            if self._visible > 1:
-                self._sc.blit(self._image[self._typ], (x * 70, y * 70))
-            else:
-                self._sc.blit(self._image['f'], (x * 70, y * 70))
+        if self._visible & (1 << player):
+            self._sc.blit(self._image[self._typ], (x * self._cell_size, y * self._cell_size))
         else:
-            if self._visible & 1:
-                self._sc.blit(self._image[self._typ], (x * 70, y * 70))
-            else:
-                self._sc.blit(self._image['f'], (x * 70, y * 70))
+            self._sc.blit(self._image['f'], (x * self._cell_size, y * self._cell_size))
+        if self._building is not None:
+            if self._visible & (1 << player):
+                self._sc.blit(self._building.img, (x * self._cell_size, y * self._cell_size))
+        if self._unit is not None:
+            if self._visible & (1 << player):
+                dx, dy = self.unit.img_size
+                pos_x, pos_y = ((x + 1) * self._cell_size - 1 - dx, (y + 1) * self._cell_size - 1 - dy)
+                self._sc.blit(self._unit.img, (pos_x, pos_y))
 
     @property
     def typ(self):

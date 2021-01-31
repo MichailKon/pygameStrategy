@@ -4,7 +4,7 @@ import sys
 import pygame
 
 
-def load_image(name, colorkey=None):
+def load_image(name, colorkey=None) -> pygame.image:
     fullname = os.path.join('data', 'images', name)
     image = pygame.image.load(fullname)
     if not os.path.isfile(fullname):
@@ -18,3 +18,11 @@ def load_image(name, colorkey=None):
     else:
         image = image.convert_alpha()
     return image
+
+
+def change_color(image, color):
+    img = image.copy()
+    img.fill((0, 0, 0, 255), None, pygame.BLEND_RGBA_MULT)
+    img.fill(color, None, pygame.BLEND_RGB_ADD)
+
+    return img
