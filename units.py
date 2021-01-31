@@ -1,9 +1,11 @@
 from constants import CELL_TYPES
+from useful_funcs import load_image
 
 
 class _BaseUnit:
     def __init__(self, x=0, y=0, can_walk=((0 & (1 << 0)) | (1 & (1 << 1)) | (1 & (1 << 2)) | (0 & (1 << 3))),
-                 hp=10, energy=1, attack_range=1, attack_func=lambda x: x**0.5, player=1):
+                 hp=10, energy=1, attack_range=1, attack_func=lambda x: x ** 0.5, player=1,
+                 second_attack=lambda x: x ** 0.5, defense: float = 0, image_name=''):
         self._pos_x = x
         self._pos_y = y
         self._can_walk = can_walk
@@ -12,6 +14,9 @@ class _BaseUnit:
         self._attack_range = attack_range
         self._attack_func = attack_func
         self._player = player
+        self._second_attack = second_attack
+        self._defense = defense
+        self._img = load_image(image_name)
 
     def is_alive(self):
         return self._hp > 0
@@ -19,7 +24,7 @@ class _BaseUnit:
     def can_attack(self, x, y) -> bool:
         first = abs(x - self._pos_x)
         second = abs(y - self._pos_y)
-        return max(first, second) == self._attack_range
+        return max(first, second) <= self._attack_range
 
     def can_move(self, x, y, typ) -> bool:
         first = abs(x - self._pos_x)
@@ -34,7 +39,7 @@ class _BaseUnit:
         return True
 
     def get_damage(self, dmg: float):
-        self._hp -= dmg
+        self._hp -= dmg * (1 - self._defense)
 
     def attack(self, enemy, second_strike=False) -> None:
         assert(issubclass(type(enemy), _BaseUnit))
@@ -42,7 +47,10 @@ class _BaseUnit:
             return
         if self._player == enemy.player:
             return
-        enemy.get_damage(self._attack_func(self._hp))
+        if not second_strike:
+            enemy.get_damage(self._attack_func(self._hp))
+        else:
+            enemy.get_damage(self._second_attack(self._hp))
 
         if enemy.is_alive() and not second_strike:
             enemy.attack(self, second_strike=True)
@@ -79,16 +87,21 @@ class _BaseUnit:
 
 
 class Warrior(_BaseUnit):
-    def __init__(self, x, y, hp=10, attack_func=lambda x: x**0.5, player=1, energy=1):
-        super().__init__(x, y, attack_func=attack_func, player=player, hp=hp, energy=energy)
+    def __init__(self, x, y, attack_func=lambda x: x ** 0.5, player=1):
+        super().__init__(x, y, attack_func=attack_func, player=player, hp=10, energy=1)
 
 
 class Archer(_BaseUnit):
-    def __init__(self, x, y, hp=10, attack_func=lambda x: x**0.5, player=1, energy=1):
-        super().__init__(x, y, attack_range=2, attack_func=attack_func, player=player, hp=hp, energy=energy)
+    def __init__(self, x, y, attack_func=lambda x: x ** 0.5, player=1):
+        super().__init__(x, y, attack_range=2, attack_func=attack_func, player=player, hp=10, energy=1)
 
 
 class JesusChrist(_BaseUnit):
-    def __init__(self, x, y, hp=10, attack_func=lambda x: x**0.5, player=1, energy=1):
+    def __init__(self, x, y, attack_func=lambda x: x ** 0.5, player=1):
         super().__init__(x, y, can_walk=((1 << 3) | (1 << 2) | (1 << 1) | (1 << 0)),
-                         attack_func=attack_func, player=player, hp=hp, energy=energy)
+                         attack_func=attack_func, player=player, hp=10, energy=1)
+
+
+class ShieldMan(_BaseUnit):
+    def __init__(self, x, y, attack_func=lambda x: x ** 0.5, player=1):
+        super().__init__(x, y, attack_func=lambda x: x ** 0.5, player=player)
