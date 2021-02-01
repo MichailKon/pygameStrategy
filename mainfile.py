@@ -7,10 +7,14 @@ from buildings import *
 from cell import Cell
 
 
+def clear_cell_info(cell: Cell):
+    pygame.draw.rect(sc, pygame.Color('grey'), (10 * 64 + 10, 70, 300, 400))
+
+
 def get_cell_info(cell: Cell, player):
     if cell is None:
         return []
-    pygame.draw.rect(sc, pygame.Color('grey'), (10 * 64 + 10, 70, 300, 400))
+    clear_cell_info(cell)
     if not cell.visible & (1 << player):
         print(cell.visible)
         return [f'Cell: {cell.x, cell.y}', 'Cell type: fog']
@@ -113,6 +117,7 @@ while run_app:
                 x, y = event.pos
                 if -162 <= x - 1000 <= 0 and -40 <= y - 640 <= 0:
                     field.next_move(cur_money, in_step)
+                    clear_cell_info(last)
                     last = None
                 else:
                     cell = field.get_click(event.pos)
@@ -120,10 +125,13 @@ while run_app:
                         f = 0
                         if cell.select == 1:
                             last.unit.move(cell.x, cell.y)
+                            clear_cell_info(cell)
                             f = 1
                             del_all_selection()
+                            last = cell
                         elif cell.select == 2:
                             last.unit.attack(cell.x, cell.y)
+                            clear_cell_info(cell)
                             del_all_selection()
                             f = 1
                         else:
@@ -136,17 +144,21 @@ while run_app:
                                         elif cell.unit.can_attack(i, j) and (i, j) != (cell.x, cell.y):
                                             field[i, j].select_two()
                             last = cell
+                            clear_cell_info(last)
                         if not f:
                             last = cell
+                            clear_cell_info(last)
                     print_cell_info(cell)
                     field.draw()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_c and \
                     isinstance(last, Cell) and isinstance(last.building, Forest) and \
                     last.private and last.private[0] == field.player and cur_money[field.player-1] >= 2:
                 last.building.cut_down(in_step, cur_money)
+                clear_cell_info(last)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_p and \
                     isinstance(last, Cell) and isinstance(last.building, WheatFields) and \
                     last.private and last.private[0] == field.player and cur_money[field.player-1] >= 5:
                 last.building.plough(in_step, cur_money)
+                clear_cell_info(last)
         print_balance(field.player)
         pygame.display.flip()
