@@ -42,7 +42,7 @@ class City(_BaseCity):
             else:
                 return self.list_of_levels[i]
 
-    def add_lev(self, inc, in_step, cur_money):
+    def add_lev(self, inc, in_step):
         old = self.level
         self.cur_lev += inc
         for i in range(len(self.list_of_levels)):
@@ -51,7 +51,7 @@ class City(_BaseCity):
             else:
                 break
         if old < self.level:
-            self.update(in_step, cur_money)
+            self.update(in_step)
 
     def current_level(self):
         return self.level
@@ -59,15 +59,13 @@ class City(_BaseCity):
     def spawn_unit(self, unit):
         self.cell.set_unit(unit)
 
-    def update(self, in_step, cur_money):
+    def update(self, in_step):
         in_step[self.pl - 1] += 1
         if self.level == 2:
             in_step[self.pl - 1] += 2
         elif self.level == 3:
-            cur_money[self.pl - 1] += 7
-        elif self.level == 4:
             self.make_private(2, 2)
-        elif self.level > 4:
+        elif self.level > 3:
             self.spawn_unit(units.JesusChrist(self.field, *self.cell.coords, player=self.pl))
 
 
@@ -92,7 +90,7 @@ class Forest(_BaseCity):
 
     def cut_down(self, in_step, cur_money):
         near_city = self.cell.private[1]
-        near_city.add_lev(2, in_step, cur_money)
+        near_city.add_lev(2, in_step)
         self.cell.set_building(None)
         cur_money[self.cell.private[0] - 1] -= 2
 
@@ -123,7 +121,7 @@ class WheatFields(_BaseCity):
 
     def plough(self, in_step, cur_money):
         near_city = self.cell.private[1]
-        near_city.add_lev(3, in_step, cur_money)
+        near_city.add_lev(3, in_step)
         cur_money[self.cell.private[0]-1] -= 5
         self.img = load_image('worked_wheat.png')
         self.worked = 1

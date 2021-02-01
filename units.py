@@ -27,6 +27,10 @@ class _BaseUnit(object):
         if player != FIRST_PLAYER:
             self._img = change_color(self._img, Color('red'))
 
+    def die(self):
+        self.field[self._pos_x, self._pos_y].set_unit(None)
+        del self
+
     def is_alive(self):
         return self._hp > 0
 
@@ -36,11 +40,17 @@ class _BaseUnit(object):
         first = abs(x - self._pos_x)
         second = abs(y - self._pos_y)
         return self.field[x, y].unit is not None and self.field[x, y].unit.player != self.player and \
-               max(first, second) <= self._attack_range and not isinstance(self, JesusChrist)
+                max(first, second) <= self._attack_range and not isinstance(self, JesusChrist)
 
-    def can_move(self, x, y) -> bool:
+    def check_energy(self):
         if not self._can_use or not self._can_walk:
             return False
+        return True
+
+    def can_move(self, x, y, check_energy=True) -> bool:
+        if check_energy:
+            if not self.check_energy():
+                return False
         first = abs(x - self._pos_x)
         second = abs(y - self._pos_y)
         if max(first, second) > self._energy or self.field[x, y].unit is not None or \
@@ -71,11 +81,11 @@ class _BaseUnit(object):
             enemy.get_damage(self._attack_func(self._hp, self._max_hp, self._attack))
         else:
             enemy.get_damage(self._attack_func(self._hp, self._max_hp, self._second_attack))
-        if not enemy.is_alive() and not second_strike and not isinstance(self, Archer):
+        if not enemy.is_alive() and not second_strike and not isinstance(self, Archer) and self.can_move(x, y, False):
             self.move(x, y)
             return
         elif not enemy.is_alive():
-            enemy = None
+            enemy.die()
             self._can_use = False
             return
 
@@ -146,7 +156,7 @@ class Archer(_BaseUnit):
 
 class JesusChrist(_BaseUnit):
     def __init__(self, field, x, y, player=1):
-        super().__init__(field, x, y, player=player, hp=20, energy=1, image_name='jesus.png', potential_attack=0,
+        super().__init__(field, x, y, player=player, hp=20, energy=2, image_name='jesus.png', potential_attack=0,
                          potential_second_attack=0)
 
 
