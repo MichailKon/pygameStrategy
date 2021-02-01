@@ -96,7 +96,7 @@ while run_app:
     in_step = [2, 2]
     cur_money = [5, 5]
     field = Field(10, sc)
-    field[0, 0].set_unit(Warrior(field, 0, 0, player=2))
+    field[0, 0].set_unit(JesusChrist(field, 0, 0, player=2))
     field.debug_print()
 
     last = None
