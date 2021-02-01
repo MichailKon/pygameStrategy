@@ -16,7 +16,7 @@ class City(_BaseCity):
     def __init__(self, player, x, y, field, start_city=False):
         super().__init__(x, y, field, 'city.png')
         self.pl = player
-        self.list_of_levels = [x * (x + 3) // 2 for x in range(0, 30)]
+        self.list_of_levels = [x * (x + 5) // 2 for x in range(0, 30)]
         self.cur_lev = 0
         self.level = 1
         self.make_private(1, 1)
