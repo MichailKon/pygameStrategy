@@ -1,15 +1,16 @@
-from constants import FIRST_PLAYER
-from useful_funcs import load_image, change_color
+from constants import FIRST_PLAYER, SECOND_PLAYER
+from useful_funcs import load_image, change_color, copy_class
 from pygame import Color, Surface, BLEND_RGBA_MULT
 
 
-class _BaseUnit:
-    def __init__(self, x=0, y=0, can_walk=((0 & (1 << 0)) | (1 & (1 << 1)) | (1 & (1 << 2)) | (0 & (1 << 3))),
+class _BaseUnit(object):
+    def __init__(self, field, x=0, y=0,
                  hp=10, energy=1, attack_range=1, attack_func=lambda x: x ** 0.5, player=FIRST_PLAYER,
                  second_attack=lambda x: x ** 0.5, defense: float = 0, image_name=''):
+        self.field = field
         self._pos_x = x
         self._pos_y = y
-        self._can_walk = can_walk
+        self._can_walk = True
         self._hp = hp
         self._energy = energy
         self._attack_range = attack_range
@@ -31,29 +32,40 @@ class _BaseUnit:
             return False
         first = abs(x - self._pos_x)
         second = abs(y - self._pos_y)
-        return max(first, second) <= self._attack_range
+        return self.field[x, y].unit is not None and self.field[x, y].unit.player != self.player and max(first, second) <= self._attack_range
 
-    def can_move(self, x, y, ind) -> bool:
-        if not self._can_use:
+    def can_move(self, x, y) -> bool:
+        if not self._can_use or not self._can_walk:
             return False
         first = abs(x - self._pos_x)
         second = abs(y - self._pos_y)
-        if max(first, second) > self._energy:
-            return False
-        if not (self._can_walk & (1 << ind)):
+        if max(first, second) > self._energy or self.field[x, y].unit is not None or (self.field[x, y].typ in 'cw' and \
+                not isinstance(self, JesusChrist)):
             return False
         return True
 
-    def move(self, x, y, ind):
-        if not self.can_move(x, y, ind):
+    def move(self, x, y):
+        if not self.can_move(x, y):
             return
-        self._pos_x, self._pos_y = x, y
+        old_x, old_y = self.pos_x, self.pos_y
+        self.field[x, y].set_unit(self)
+        self.field[x, y].unit.set_pos_x(x)
+        self.field[x, y].unit.set_pos_y(y)
+        self.field[old_x, old_y].set_unit(None)
+        for i in range(self.pos_x - 1, self.pos_x + 1 + 1):
+            for j in range(self.pos_y - 1, self.pos_y + 1 + 1):
+                if 0 <= i < self.field.sz and 0 <= j < self.field.sz:
+                    self.field[i, j].set_visible(self.field[i, j].visible
+                                                 | ((1 << FIRST_PLAYER) if self.field.player == FIRST_PLAYER
+                                                    else (1 << SECOND_PLAYER)))
+        self._can_walk = False
+
 
     def get_damage(self, dmg: float):
         self._hp -= dmg * (1 - self._defense)
 
+
     def attack(self, enemy, second_strike=False) -> None:
-        assert(issubclass(type(enemy), _BaseUnit))
         if not self.can_attack(enemy.pos_x, enemy.pos_y):
             return
         if self._player == enemy.player:
@@ -97,6 +109,14 @@ class _BaseUnit:
         return self._player
 
     @property
+    def set_walk(self):
+        self._can_walk = True
+
+    @property
+    def set_use(self):
+        self._can_use = True
+
+    @property
     def img(self):
         return self._img
 
@@ -112,25 +132,25 @@ class _BaseUnit:
 
 
 class Warrior(_BaseUnit):
-    def __init__(self, x, y, attack_func=lambda x: x ** 0.5, player=FIRST_PLAYER):
-        super().__init__(x, y, attack_func=attack_func, player=player, hp=10, energy=1, image_name='warrior.png')
+    def __init__(self, field, x, y, attack_func=lambda x: x ** 0.5, player=FIRST_PLAYER):
+        super().__init__(field, x, y, attack_func=attack_func, player=player, hp=10, energy=1, image_name='warrior.png')
 
 
 class Archer(_BaseUnit):
-    def __init__(self, x, y, attack_func=lambda x: x ** 0.5, player=FIRST_PLAYER):
-        super().__init__(x, y, attack_range=2, attack_func=attack_func,
+    def __init__(self, field, x, y, attack_func=lambda x: x ** 0.5, player=FIRST_PLAYER):
+        super().__init__(field, x, y, attack_range=2, attack_func=attack_func,
                          player=player, hp=10, energy=1, image_name='archer.png')
 
 
 class JesusChrist(_BaseUnit):
-    def __init__(self, x, y, attack_func=lambda x: x ** 0.5, player=FIRST_PLAYER):
-        super().__init__(x, y, can_walk=((1 << 3) | (1 << 2) | (1 << 1) | (1 << 0)),
+    def __init__(self, field, x, y, attack_func=lambda x: x ** 0.5, player=FIRST_PLAYER):
+        super().__init__(field, x, y, can_walk=((1 << 3) | (1 << 2) | (1 << 1) | (1 << 0)),
                          attack_func=attack_func, player=player, hp=10, energy=1, image_name='jesus.png')
 
 
 class ShieldMan(_BaseUnit):
-    def __init__(self, x, y, attack_func=lambda x: x ** 0.5, player=1):
-        super().__init__(x, y, attack_func=lambda x: x ** 0.5, player=player, image_name='shield_man.png')
+    def __init__(self, field, x, y, attack_func=lambda x: x ** 0.5, player=1):
+        super().__init__(field, x, y, attack_func=lambda x: x ** 0.5, player=player, image_name='shield_man.png')
 
 
 if __name__ == '__main__':

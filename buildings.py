@@ -21,7 +21,7 @@ class City(_BaseCity):
         self.level = 1
         self.make_private(1, 1)
         if start_city:
-            self.spawn_unit(units.Warrior(x, y))
+            self.spawn_unit(units.Warrior(field, x, y, player=player))
         self.img = change_color(self.img, Color('white'))
 
     def make_private(self, len1, len2):
@@ -60,7 +60,7 @@ class City(_BaseCity):
         elif self.level == 4:
             self.make_private(2, 2)
         elif self.level > 4:
-            self.spawn_unit(units.JesusChrist(*self.cell.coords, player=self.pl))
+            self.spawn_unit(units.JesusChrist(self.field, *self.cell.coords, player=self.pl))
 
 
 class Village(_BaseCity):

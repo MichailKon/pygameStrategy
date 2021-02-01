@@ -7,28 +7,23 @@ from buildings import *
 from cell import Cell
 
 
-class Query:
-    def __init__(self, q_type=None, add_info=None):
-        self.q_type = q_type
-        self.add_info = add_info
-        # 1 = key_down
-        # 2 = mouse_down
-
-
 def get_cell_info(cell: Cell, player):
-    sc.fill(pygame.Color('black'))
-    print(cell.visible)
+    if cell is None:
+        return []
+    pygame.draw.rect(sc, pygame.Color('grey'), (10 * 64 + 10, 70, 300, 400))
     if not cell.visible & (1 << player):
-        return [f'Cell: {cell.x, cell.y, "f"}']
+        print(cell.visible)
+        return [f'Cell: {cell.x, cell.y}', 'Cell type: fog']
     ans = []
-    ans.append(f'Cell: {cell.x, cell.y, cell.typ}')
+    ans.append(f'Cell coords: {cell.x, cell.y}')
+    ans.append(f'Cell type: {dict([("w", "water"), ("g", "grass"), ("s", "sand"), ("c", "climbs")])[cell.typ]}')
     if cell.unit is not None:
         ans.append(f'Unit: {cell.unit.__class__.__name__}')
-        ans.append(f'Unit.hp: {cell.unit.hp}')
+        ans.append(f'Unit HP: {cell.unit.hp}')
     if cell.building is not None:
         ans.append(f'Building: {cell.building.__class__.__name__}')
         if isinstance(cell.building, City):
-            ans.append(f'Building.level: {cell.building.level}')
+            ans.append(f'Level of Сity: {cell.building.level}')
     if cell.private:
         ans.append(f'Private: {cell.private[0]}')
     return ans
@@ -36,44 +31,110 @@ def get_cell_info(cell: Cell, player):
 
 def print_cell_info(cell):
     font = pygame.font.Font(None, 30)
-    text_coord = 10
+    text_coord = 70
     ans = get_cell_info(cell, field.player)
     for i in ans:
-        string_rendered = font.render(i, 1, pygame.Color('white'))
+        string_rendered = font.render(i, 1, pygame.Color('black'))
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
-        intro_rect.x = 12 * 64 + 10
+        intro_rect.x = 10 * 64 + 10
         text_coord += intro_rect.height
         sc.blit(string_rendered, intro_rect)
 
 
+def print_balance(player):
+    global in_step, cur_money
+    ans = []
+    ans.append(f'Current money: {cur_money[player - 1]}')
+    ans.append(f'Money in step: {in_step[player - 1]}')
+    font = pygame.font.Font(None, 30)
+    text_coord = 10
+    pygame.draw.rect(sc, 'grey',
+                     (10 * 64 + 10, 0, 200, 70))
+    for i in ans:
+        string_rendered = font.render(i, 1, pygame.Color('red'))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 10 * 64 + 10
+        text_coord += intro_rect.height
+        sc.blit(string_rendered, intro_rect)
+
+
+def del_all_selection():
+    for i in range(field.sz):
+        for j in range(field.sz):
+            field[i, j].select = None
+
+
 pygame.init()
-sc = pygame.display.set_mode((1000, 800))
-in_step = [2, 2]
-cur_money = [5, 5]
+sc = pygame.display.set_mode((1000, 10 * 64))
+fon_img = load_image('fon.png')
+skip_img = load_image('skip.png')
 
-field = Field(12, sc)
-field.debug_print()
-
-run = 1
+run_app = 1
 now = datetime.datetime.now()
-first_pre_last, second_pre_last = Query(), Query()
-first_last, second_last = Query(), Query()
-while run:
-    # if (datetime.datetime.now() - now).total_seconds() > 2:
-    #     now = datetime.datetime.now()
-    #     field.next_move()
-    field.draw()
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = 0
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            cell = field.get_click(event.pos)
-            if field.player == FIRST_PLAYER:
-                if first_last.q_type is None or first_last.q_type == 2:
+
+while run_app:
+    local_run = 1
+    while local_run and run_app:
+        sc.blit(fon_img, (0, 0))
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT or event.type == pygame.KEYDOWN and \
+                    event.key == pygame.K_ESCAPE:
+                run_app = 0
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_n:
+                print(1)
+                local_run = 0
+    if local_run == 1:
+        break
+
+    sc.fill('grey')
+    run_game = 1
+    in_step = [2, 2]
+    cur_money = [5, 5]
+    field = Field(10, sc)
+    field[0, 0].set_unit(Warrior(field, 0, 0, player=2))
+    field.debug_print()
+
+    last = None
+
+    while run_game and run_app:
+        field.draw()
+        sc.blit(skip_img, (1000 - 162, 640 - 40))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run_app = 0
+            if event.type == pygame.KEYDOWN and \
+                    event.key == pygame.K_ESCAPE:
+                run_game = 0
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = event.pos
+                if -162 <= x - 1000 <= 0 and -40 <= y - 640 <= 0:
+                    field.next_move(cur_money, in_step)
+                    last = None
+                else:
+                    cell = field.get_click(event.pos)
+                    if cell is not None:
+                        if cell.select == 1:
+                            last.move(cell.x, cell.y)
+                            del_all_selection()
+                        elif cell.select == 2:
+                            last.attack(cell.x, cell.y)
+                            del_all_selection()
+                        else:
+                            del_all_selection()
+                            if cell.unit is not None and cell.unit.player == field.player:
+                                for i in range(field.sz):
+                                    for j in range(field.sz):
+                                        if cell.unit.can_move(i, j) and (i, j) != (cell.x, cell.y):
+                                            field[i, j].select_one()
+                                        elif cell.unit.can_attack(i, j) and (i, j) != (cell.x, cell.y):
+                                            field[i, j].select_two()
+                            last = cell.unit
                     print_cell_info(cell)
-            else:
-                if second_last.q_type is None or second_last.q_type == 2:
-                    print_cell_info(cell)
-    pygame.display.flip()
+                    field.draw()
+        print_balance(field.player)
+        pygame.display.flip()

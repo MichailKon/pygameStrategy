@@ -120,8 +120,14 @@ class Field:
             for j in range(self.sz):
                 self.long_matrix[i][j].draw(self.player)
 
-    def next_move(self):
+    def next_move(self, cur_money, in_step):
+        for i in range(self.sz):
+            for j in range(self.sz):
+                if self[i, j].unit is not None:
+                    self[i, j].unit.set_use
+                    self[i, j].unit.set_walk
         self.cur += 1
+        cur_money[self.player-1] += in_step[self.player-1]
         self.player = FIRST_PLAYER if self.player == SECOND_PLAYER else SECOND_PLAYER
 
     def get_cell(self, mouse_pos: tuple) -> None or tuple:

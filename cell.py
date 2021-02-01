@@ -7,7 +7,9 @@ class Cell:
                  private=None, building=None, unit=None, tree_coefficient=0, cell_size=64):
         self._image = {'w': load_image('water.bmp'), 'g': load_image('grass.bmp'),
                        'c': load_image('climbs.bmp'), 's': load_image('sand.bmp'), 'f': load_image('fog.bmp')}
-
+        self.select = None
+        self.sel_move = load_image('blue_target.png', colorkey=-1)
+        self.sel_target = load_image('red_target.png', colorkey=-1)
         self._sc = screen
         self._typ = typ
         self._coords = x, y
@@ -72,7 +74,15 @@ class Cell:
                 dx, dy = self.unit.img_size
                 pos_x, pos_y = ((x + 1) * self._cell_size - 1 - dx, (y + 1) * self._cell_size - 1 - dy)
                 self._sc.blit(self._unit.img, (pos_x, pos_y))
-
+        if self.select is not None:
+            if self.select == 2:
+                self._sc.blit(self.sel_target, (x * self._cell_size, y * self._cell_size))
+            else:
+                self._sc.blit(self.sel_move, (x * self._cell_size, y * self._cell_size))
+    def select_one(self):
+        self.select = 1
+    def select_two(self):
+        self.select = 2
     @property
     def typ(self):
         return self._typ
