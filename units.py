@@ -112,13 +112,11 @@ class _BaseUnit(object):
     def player(self):
         return self._player
 
-    @property
-    def set_walk(self):
-        self._can_walk = True
+    def set_walk(self, new_val=True):
+        self._can_walk = new_val
 
-    @property
-    def set_use(self):
-        self._can_use = True
+    def set_use(self, new_val=True):
+        self._can_use = new_val
 
     @property
     def img(self):

@@ -124,8 +124,8 @@ class Field:
         for i in range(self.sz):
             for j in range(self.sz):
                 if self[i, j].unit is not None:
-                    self[i, j].unit.set_use
-                    self[i, j].unit.set_walk
+                    self[i, j].unit.set_use()
+                    self[i, j].unit.set_walk()
                     self[i, j].select = None
         self.cur += 1
         cur_money[self.player - 1] += in_step[self.player - 1]

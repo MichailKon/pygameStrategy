@@ -152,13 +152,31 @@ while run_app:
                     field.draw()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_c and \
                     isinstance(last, Cell) and isinstance(last.building, Forest) and \
-                    last.private and last.private[0] == field.player and cur_money[field.player-1] >= 2:
+                    last.private and last.private[0] == field.player and cur_money[field.player - 1] >= 2:
                 last.building.cut_down(in_step, cur_money)
                 clear_cell_info(last)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_p and \
                     isinstance(last, Cell) and isinstance(last.building, WheatFields) and \
-                    last.private and last.private[0] == field.player and cur_money[field.player-1] >= 5:
+                    last.private and last.private[0] == field.player and cur_money[field.player - 1] >= 5:
                 last.building.plough(in_step, cur_money)
                 clear_cell_info(last)
+            can_spawn = isinstance(last, Cell) and isinstance(last.building, City)
+            if can_spawn and last.private and last.unit is None:
+                can_spawn &= last.private[0] == field.player
+            else:
+                can_spawn = False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_a and can_spawn and \
+                    cur_money[field.player - 1] >= 4 and last.building.current_level() >= 3:
+                new_unit = Archer(field, last.x, last.y, player=field.player)
+                new_unit.set_use(False)
+                last.set_unit(new_unit)
+                cur_money[field.player - 1] -= 4
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_s and can_spawn and \
+                    cur_money[field.player - 1] >= 3 and last.building.current_level() >= 2:
+                new_unit = ShieldMan(field, last.x, last.y, player=field.player)
+                new_unit.set_use(False)
+                last.set_unit(new_unit)
+                cur_money[field.player - 1] -= 3
+
         print_balance(field.player)
         pygame.display.flip()
