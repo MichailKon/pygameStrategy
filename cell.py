@@ -79,10 +79,13 @@ class Cell:
                 self._sc.blit(self.sel_target, (x * self._cell_size, y * self._cell_size))
             else:
                 self._sc.blit(self.sel_move, (x * self._cell_size, y * self._cell_size))
+
     def select_one(self):
         self.select = 1
+
     def select_two(self):
         self.select = 2
+
     @property
     def typ(self):
         return self._typ

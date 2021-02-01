@@ -23,7 +23,7 @@ def get_cell_info(cell: Cell, player):
     if cell.building is not None:
         ans.append(f'Building: {cell.building.__class__.__name__}')
         if isinstance(cell.building, City):
-            ans.append(f'Level of Сity: {cell.building.level}')
+            ans.append(f'Level of Сity: {cell.building.level} ___ 0 \ {cell.building.progress - cell.building.cur_lev}')
     if cell.private:
         ans.append(f'Private: {cell.private[0]}')
     return ans
@@ -96,7 +96,6 @@ while run_app:
     in_step = [2, 2]
     cur_money = [5, 5]
     field = Field(10, sc)
-    field[0, 0].set_unit(JesusChrist(field, 0, 0, player=2))
     field.debug_print()
 
     last = None
@@ -118,12 +117,15 @@ while run_app:
                 else:
                     cell = field.get_click(event.pos)
                     if cell is not None:
+                        f = 0
                         if cell.select == 1:
-                            last.move(cell.x, cell.y)
+                            last.unit.move(cell.x, cell.y)
+                            f = 1
                             del_all_selection()
                         elif cell.select == 2:
-                            last.attack(cell.x, cell.y)
+                            last.unit.attack(cell.x, cell.y)
                             del_all_selection()
+                            f = 1
                         else:
                             del_all_selection()
                             if cell.unit is not None and cell.unit.player == field.player:
@@ -133,8 +135,18 @@ while run_app:
                                             field[i, j].select_one()
                                         elif cell.unit.can_attack(i, j) and (i, j) != (cell.x, cell.y):
                                             field[i, j].select_two()
-                            last = cell.unit
+                            last = cell
+                        if not f:
+                            last = cell
                     print_cell_info(cell)
                     field.draw()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_c and \
+                    isinstance(last, Cell) and isinstance(last.building, Forest) and \
+                    last.private and last.private[0] == field.player and cur_money[field.player-1] >= 2:
+                last.building.cut_down(in_step, cur_money)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_p and \
+                    isinstance(last, Cell) and isinstance(last.building, WheatFields) and \
+                    last.private and last.private[0] == field.player and cur_money[field.player-1] >= 5:
+                last.building.plough(in_step, cur_money)
         print_balance(field.player)
         pygame.display.flip()

@@ -34,6 +34,14 @@ class City(_BaseCity):
                                                  | ((1 << FIRST_PLAYER) if self.pl == FIRST_PLAYER
                                                     else (1 << SECOND_PLAYER)))
 
+    @property
+    def progress(self):
+        for i in range(len(self.list_of_levels)):
+            if self.list_of_levels[i] <= self.cur_lev:
+                self.level = i + 1
+            else:
+                return self.list_of_levels[i]
+
     def add_lev(self, inc, in_step, cur_money):
         old = self.level
         self.cur_lev += inc
@@ -86,6 +94,7 @@ class Forest(_BaseCity):
         near_city = self.cell.private[1]
         near_city.add_lev(2, in_step, cur_money)
         self.cell.set_building(None)
+        cur_money[self.cell.private[0] - 1] -= 2
 
 
 class LumberHut(_BaseCity):
@@ -113,12 +122,8 @@ class WheatFields(_BaseCity):
         self.worked = 0
 
     def plough(self, in_step, cur_money):
-        try:
-            near_city = self.cell.private[1]
-            near_city.add_lev(3, in_step, cur_money)
-            self.img = load_image('worked_wheat.png')
-            self.worked = 1
-        except TypeError:
-            return
-        except Exception as e:
-            print(e.__class__.__name__, e)
+        near_city = self.cell.private[1]
+        near_city.add_lev(3, in_step, cur_money)
+        cur_money[self.cell.private[0]-1] -= 5
+        self.img = load_image('worked_wheat.png')
+        self.worked = 1

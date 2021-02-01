@@ -128,7 +128,7 @@ class Field:
                     self[i, j].unit.set_walk
                     self[i, j].select = None
         self.cur += 1
-        cur_money[self.player-1] += in_step[self.player-1]
+        cur_money[self.player - 1] += in_step[self.player - 1]
         self.player = FIRST_PLAYER if self.player == SECOND_PLAYER else SECOND_PLAYER
 
     def get_cell(self, mouse_pos: tuple) -> None or tuple:

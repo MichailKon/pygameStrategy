@@ -6,7 +6,8 @@ from pygame import Color, Surface, BLEND_RGBA_MULT
 class _BaseUnit(object):
     def __init__(self, field, x=0, y=0,
                  hp=10, energy=1, attack_range=1, potential_attack=5, player=FIRST_PLAYER,
-                 potential_second_attack=5, attack_func=lambda hp, max_hp, p: max(0.6, hp/max_hp) * p, defense: float = 0, image_name=''):
+                 potential_second_attack=5, attack_func=lambda hp, max_hp, p: max(0.6, hp / max_hp) * p,
+                 defense: float = 0, image_name=''):
         self.field = field
         self._pos_x = x
         self._pos_y = y
@@ -34,15 +35,16 @@ class _BaseUnit(object):
             return False
         first = abs(x - self._pos_x)
         second = abs(y - self._pos_y)
-        return self.field[x, y].unit is not None and self.field[x, y].unit.player != self.player and max(first, second) <= self._attack_range and not isinstance(self, JesusChrist)
+        return self.field[x, y].unit is not None and self.field[x, y].unit.player != self.player and \
+               max(first, second) <= self._attack_range and not isinstance(self, JesusChrist)
 
     def can_move(self, x, y) -> bool:
         if not self._can_use or not self._can_walk:
             return False
         first = abs(x - self._pos_x)
         second = abs(y - self._pos_y)
-        if max(first, second) > self._energy or self.field[x, y].unit is not None or (self.field[x, y].typ in 'cw' and \
-                not isinstance(self, JesusChrist)):
+        if max(first, second) > self._energy or self.field[x, y].unit is not None or \
+                (self.field[x, y].typ in 'cw' and not isinstance(self, JesusChrist)):
             return False
         return True
 
@@ -146,16 +148,19 @@ class Archer(_BaseUnit):
 
 class JesusChrist(_BaseUnit):
     def __init__(self, field, x, y, player=1):
-        super().__init__(field, x, y, player=player, hp=20, energy=1, image_name='jesus.png', potential_attack=0, potential_second_attack=0)
+        super().__init__(field, x, y, player=player, hp=20, energy=1, image_name='jesus.png', potential_attack=0,
+                         potential_second_attack=0)
 
 
 class ShieldMan(_BaseUnit):
     def __init__(self, field, x, y, player=1):
-        super().__init__(field, x, y, player=player, image_name='shield_man.png', potential_attack=3, potential_second_attack=7, defense=0.3)
+        super().__init__(field, x, y, player=player, image_name='shield_man.png', potential_attack=3,
+                         potential_second_attack=7, defense=0.3)
 
 
 if __name__ == '__main__':
     import pygame
+
     pygame.init()
     sc = pygame.display.set_mode((800, 700))
 
