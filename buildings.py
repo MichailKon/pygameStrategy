@@ -64,7 +64,7 @@ class City(_BaseCity):
         if self.level == 2:
             in_step[self.pl - 1] += 2
         elif self.level == 3:
-            cur_money[self.pl - 1] += 20
+            cur_money[self.pl - 1] += 7
         elif self.level == 4:
             self.make_private(2, 2)
         elif self.level > 4:
