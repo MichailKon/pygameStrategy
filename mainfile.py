@@ -134,6 +134,7 @@ while run_app:
                             f = 1
                         else:
                             del_all_selection()
+                            cell.select_three()
                             if cell.unit is not None and cell.unit.player == field.player:
                                 for i in range(field.sz):
                                     for j in range(field.sz):
@@ -172,13 +173,14 @@ while run_app:
                 del_all_selection()
                 last.set_unit(new_unit)
                 cur_money[field.player - 1] -= 4
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_s and can_spawn and \
-                    cur_money[field.player - 1] >= 3 and last.building.current_level() >= 2:
-                new_unit = ShieldMan(field, last.x, last.y, player=field.player)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_w and can_spawn and \
+                    cur_money[field.player - 1] >= 2 and last.building.current_level() >= 1:
+                new_unit = Warrior(field, last.x, last.y, player=field.player)
                 new_unit.set_use(False)
                 last.set_unit(new_unit)
                 del_all_selection()
-                cur_money[field.player - 1] -= 3
+                cur_money[field.player - 1] -= 2
+
 
         print_balance(field.player)
         pygame.display.flip()

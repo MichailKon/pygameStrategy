@@ -10,6 +10,7 @@ class Cell:
         self.select = None
         self.sel_move = load_image('blue_target.png', colorkey=-1)
         self.sel_target = load_image('red_target.png', colorkey=-1)
+        self.sel_sel = load_image('select.png', colorkey=-1)
         self._sc = screen
         self._typ = typ
         self._coords = x, y
@@ -77,14 +78,19 @@ class Cell:
         if self.select is not None:
             if self.select == 2:
                 self._sc.blit(self.sel_target, (x * self._cell_size, y * self._cell_size))
-            else:
+            elif self.select == 1:
                 self._sc.blit(self.sel_move, (x * self._cell_size, y * self._cell_size))
+            elif self.select == 3:
+                self._sc.blit(self.sel_sel, (x * self._cell_size, y * self._cell_size))
 
     def select_one(self):
         self.select = 1
 
     def select_two(self):
         self.select = 2
+
+    def select_three(self):
+        self.select = 3
 
     @property
     def typ(self):
