@@ -27,7 +27,7 @@ class Field:
 
         return field
 
-    def __init__(self, size, screen, god_mode=0):
+    def __init__(self, size, screen, in_step, god_mode=0):
         self.sc = screen
         self.sz = size
         self.cell_size = 64
@@ -46,6 +46,7 @@ class Field:
                 for y in range(1, size - 1):
                     if self.long_matrix[x][y].typ in ['s', 'g']:
                         self.long_matrix[x][y].set_building(City(FIRST_PLAYER, x, y, self, start_city=True))
+                        in_step[0] += 2
                         assert False
             except AssertionError:
                 break
@@ -55,12 +56,13 @@ class Field:
                 for y in range(size - 2, 0, -1):
                     if self.long_matrix[x][y].typ in ['s', 'g']:
                         self.long_matrix[x][y].set_building(City(SECOND_PLAYER, x, y, self, start_city=True))
+                        in_step[1] += 2
                         assert False
             except AssertionError:
                 break
 
-        for x in range(1, size - 1):
-            for y in range(1, size - 1):
+        for x in range(2, size - 2):
+            for y in range(2, size - 2):
                 if self.long_matrix[x][y].typ not in ['g', 's']:
                     continue
 
@@ -74,7 +76,7 @@ class Field:
                             castle_near = True
                 if castle_near:
                     continue
-                if random.randint(1, 10) == 1:
+                if random.randint(1, 20) <= 3:
                     self.long_matrix[x][y].set_building(Village(x, y, self))
 
         for x in range(size):

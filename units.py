@@ -7,8 +7,9 @@ class _BaseUnit(object):
     def __init__(self, field, x=0, y=0,
                  hp=10, energy=1, attack_range=1, potential_attack=5, player=FIRST_PLAYER,
                  potential_second_attack=5, attack_func=lambda hp, max_hp, p: max(0.6, hp / max_hp) * p,
-                 defense: float = 0, image_name=''):
+                 defense: float = 0, image_name='', city=None):
         self.field = field
+        self.spawn_city = city
         self._pos_x = x
         self._pos_y = y
         self._can_walk = True
@@ -28,6 +29,7 @@ class _BaseUnit(object):
             self._img = change_color(self._img, Color('red'))
 
     def die(self):
+        self.spawn_city.count_of_units -= 1
         self.field[self._pos_x, self._pos_y].set_unit(None)
         del self
 
@@ -40,7 +42,7 @@ class _BaseUnit(object):
         first = abs(x - self._pos_x)
         second = abs(y - self._pos_y)
         return self.field[x, y].unit is not None and self.field[x, y].unit.player != self.player and \
-                max(first, second) <= self._attack_range and not isinstance(self, JesusChrist)
+               max(first, second) <= self._attack_range and not isinstance(self, JesusChrist)
 
     def check_energy(self):
         if not self._can_use or not self._can_walk:
@@ -81,7 +83,7 @@ class _BaseUnit(object):
             enemy.get_damage(self._attack_func(self._hp, self._max_hp, self._attack))
         else:
             enemy.get_damage(self._attack_func(self._hp, self._max_hp, self._second_attack))
-        if not enemy.is_alive() and not second_strike and not isinstance(self, Archer) and self.can_move(x, y, False):
+        if not enemy.is_alive() and not second_strike and not isinstance(self, Archer) and not isinstance(enemy, JesusChrist):
             self.move(x, y)
             return
         elif not enemy.is_alive():
@@ -144,26 +146,26 @@ class _BaseUnit(object):
 
 
 class Warrior(_BaseUnit):
-    def __init__(self, field, x, y, player=FIRST_PLAYER):
-        super().__init__(field, x, y, player=player, hp=10, energy=1, image_name='warrior.png')
+    def __init__(self, field, x, y, player=FIRST_PLAYER, city=None):
+        super().__init__(field, x, y, player=player, hp=10, energy=1, image_name='warrior.png', city=city)
 
 
 class Archer(_BaseUnit):
     def __init__(self, field, x, y, player=1):
         super().__init__(field, x, y, attack_range=2,
-                         player=player, hp=10, energy=1, image_name='archer.png')
+                         player=player, hp=10, energy=1, image_name='archer.png', city=city)
 
 
 class JesusChrist(_BaseUnit):
-    def __init__(self, field, x, y, player=1):
+    def __init__(self, field, x, y, player=1, city=None):
         super().__init__(field, x, y, player=player, hp=20, energy=2, image_name='jesus.png', potential_attack=0,
-                         potential_second_attack=0)
+                         potential_second_attack=0, city=city)
 
 
 class ShieldMan(_BaseUnit):
-    def __init__(self, field, x, y, player=1):
+    def __init__(self, field, x, y, player=1, city=None):
         super().__init__(field, x, y, player=player, image_name='shield_man.png', potential_attack=3,
-                         potential_second_attack=7, defense=0.3)
+                         potential_second_attack=7, defense=0.3, city=city)
 
 
 if __name__ == '__main__':

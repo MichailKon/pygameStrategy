@@ -40,9 +40,9 @@ def load_image(name, colorkey=None) -> pygame.image:
     return image
 
 
-def change_color(image, color):
+def change_color(image, color, find=(0, 0, 0)):
     img = image.copy()
-    img.fill((0, 0, 0, 255), None, pygame.BLEND_RGBA_MULT)
+    img.fill(find, None, pygame.BLEND_RGBA_MULT)
     img.fill(color, None, pygame.BLEND_RGB_ADD)
 
     return img

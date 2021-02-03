@@ -1,12 +1,19 @@
 from useful_funcs import load_image
-from constants import FIRST_PLAYER, SECOND_PLAYER
+from buildings import *
 
 
 class Cell:
     def __init__(self, x=0, y=0, typ='', screen=None, visible_for_first=0, visible_for_second=0,
                  private=None, building=None, unit=None, tree_coefficient=0, cell_size=64):
         self._image = {'w': load_image('water.bmp'), 'g': load_image('grass.bmp'),
-                       'c': load_image('climbs.bmp'), 's': load_image('sand.bmp'), 'f': load_image('fog.bmp')}
+                       'c': load_image('climbs.bmp'), 's': load_image('sand.bmp'),
+                       'f': load_image('fog.bmp'), 'l1': load_image('left.png', colorkey=-1),
+                       'r1': load_image('right.png', colorkey=-1), 'u1': load_image('up.png', colorkey=-1),
+                       'd1': load_image('down.png', colorkey=-1)}
+
+        self._image.update({'l2': load_image('left1.png', colorkey=-1),
+                       'r2': load_image('right1.png', colorkey=-1), 'u2': load_image('up1.png', colorkey=-1),
+                       'd2': load_image('down1.png', colorkey=-1)})
         self.select = None
         self.sel_move = load_image('blue_target.png', colorkey=-1)
         self.sel_target = load_image('red_target.png', colorkey=-1)
@@ -24,6 +31,10 @@ class Cell:
     @property
     def private(self):
         return self._private
+
+    @property
+    def im(self):
+        return self._image
 
     @property
     def coords(self):
@@ -70,6 +81,10 @@ class Cell:
         if self._building is not None:
             if self._visible & (1 << player):
                 self._sc.blit(self._building.img, (x * self._cell_size, y * self._cell_size))
+                if (isinstance(self._building, Village) or isinstance(self._building,
+                                                                      City)) and self.building.is_capture:
+                    self._sc.blit(self._building.captur, (x * self._cell_size, y * self._cell_size))
+
         if self._unit is not None:
             if self._visible & (1 << player):
                 dx, dy = self.unit.img_size
