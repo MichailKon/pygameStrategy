@@ -58,7 +58,6 @@ class City(_BaseCity):
         if old < self.level:
             self.update(in_step)
 
-
     def current_level(self):
         return self.level
 

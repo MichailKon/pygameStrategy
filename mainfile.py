@@ -1,12 +1,12 @@
-import pygame
-from board import Field
-import datetime
-from constants import FIRST_PLAYER, SECOND_PLAYER
-from useful_funcs import load_image, change_color
+import os
 import random
-from units import *
+
+import pygame
+
+from board import Field
 from buildings import *
 from cell import Cell
+from units import *
 
 
 def clear_cell_info():
@@ -84,7 +84,7 @@ def draw_borders():
     for i in range(field.sz):
         for j in range(field.sz):
             if not field[i, j].visible & (1 << field.player):
-                continue;
+                continue
             if field[i, j].private and field[i, j].private[0]:
                 p = field[i, j].private[0]
                 if p == 1:
@@ -108,7 +108,7 @@ def draw_borders():
     for i in range(field.sz - 1):
         for j in range(field.sz):
             if not field[i, j].visible & (1 << field.player):
-                continue;
+                continue
             if field[i, j].private:
                 p = field[i, j].private[0]
                 if p == 1:
@@ -121,7 +121,7 @@ def draw_borders():
     for i in range(field.sz):
         for j in range(field.sz - 1):
             if not field[i, j].visible & (1 << field.player):
-                continue;
+                continue
             if field[i, j].private:
                 p = field[i, j].private[0]
                 if p == 1:
@@ -134,7 +134,7 @@ def draw_borders():
     for i in range(1, field.sz):
         for j in range(field.sz):
             if not field[i, j].visible & (1 << field.player):
-                continue;
+                continue
             if field[i, j].private:
                 p = field[i, j].private[0]
                 if p == 1:
@@ -147,7 +147,7 @@ def draw_borders():
     for i in range(field.sz):
         for j in range(1, field.sz):
             if not field[i, j].visible & (1 << field.player):
-                continue;
+                continue
             if field[i, j].private:
                 p = field[i, j].private[0]
                 if p == 1:
@@ -166,6 +166,7 @@ skip_img = load_image('skip.png')
 run_app = 1
 
 while run_app:
+    pygame.mixer.music.stop()
     local_run = 1
     while local_run and run_app:
         sc.blit(fon_img, (0, 0))
@@ -175,7 +176,6 @@ while run_app:
                     event.key == pygame.K_ESCAPE:
                 run_app = 0
             if event.type == pygame.KEYDOWN and event.key == pygame.K_n:
-                print(1)
                 local_run = 0
     if local_run == 1:
         break
@@ -185,7 +185,9 @@ while run_app:
     in_step = [0, 0]
     cur_money = [5, 5]
     field = Field(10, sc, in_step)
-    field.debug_print()
+
+    pygame.mixer.music.load(os.path.join('data', 'music', 'main_music.mp3'))
+    pygame.mixer.music.play()
 
     last = None
     while run_game > 0 and run_app:
@@ -216,8 +218,9 @@ while run_app:
                                             in_step[field[k, l].private[0] - 1] += 1
                                             field[k, l].private[1].doxod += 1
                         if field[i, j].unit and (
-                                isinstance(field[i, j].building, City) and field[i, j].unit.player != field[
-                            i, j].building.pl or isinstance(field[i, j].building, Village)):
+                                isinstance(field[i, j].building, City) and
+                                field[i, j].unit.player != field[i, j].building.pl or
+                                isinstance(field[i, j].building, Village)):
                             field[i, j].building.is_capture = True
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
@@ -235,12 +238,13 @@ while run_app:
                                     for k in range(i - 1, i + 2):
                                         for l in range(j - 1, j + 2):
                                             if 0 <= k < 10 and 0 <= l < 10 and isinstance(field[k, l].building,
-                                                                                            LumberHut):
+                                                                                          LumberHut):
                                                 in_step[field[k, l].private[0] - 1] += 1
                                                 field[k, l].private[1].doxod += 1
                             if field[i, j].unit and (
-                                    isinstance(field[i, j].building, City) and field[i, j].unit.player != field[
-                                i, j].building.pl or isinstance(field[i, j].building, Village)):
+                                    isinstance(field[i, j].building, City) and
+                                    field[i, j].unit.player != field[i, j].building.pl or
+                                    isinstance(field[i, j].building, Village)):
                                 field[i, j].building.is_capture = True
                 else:
                     cell = field.get_click(event.pos)
@@ -293,22 +297,22 @@ while run_app:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_c and \
                     isinstance(last, Cell) and isinstance(last.building, Forest) and \
                     last.private and last.private[0] == field.player and cur_money[field.player - 1] >= 2:
-                for i in range(last.x-1, last.x+2):
-                    for j in range(last.y-1, last.y+2):
-                        if 0<=i<10 and 0<=j<10 and isinstance(field[i, j].building, LumberHut):
-                            in_step[field[i, j].private[0]-1]-=1
-                            field[i, j].private[1].doxod-=1
+                for i in range(last.x - 1, last.x + 2):
+                    for j in range(last.y - 1, last.y + 2):
+                        if 0 <= i < 10 and 0 <= j < 10 and isinstance(field[i, j].building, LumberHut):
+                            in_step[field[i, j].private[0] - 1] -= 1
+                            field[i, j].private[1].doxod -= 1
                 last.building.cut_down(in_step, cur_money)
                 clear_cell_info()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_p and \
                     isinstance(last, Cell) and isinstance(last.building, WheatFields) and \
                     last.private and last.private[0] == field.player and cur_money[field.player - 1] >= 5:
                 last.building.plough(in_step, cur_money)
-                for i in range(last.x-1, last.x+2):
-                    for j in range(last.y-1, last.y+2):
-                        if 0<=i<10 and 0<=j<10 and isinstance(field[i, j].building, WindMill):
-                            in_step[field[i, j].private[0]-1]+=2
-                            field[i, j].private[1].doxod+=2
+                for i in range(last.x - 1, last.x + 2):
+                    for j in range(last.y - 1, last.y + 2):
+                        if 0 <= i < 10 and 0 <= j < 10 and isinstance(field[i, j].building, WindMill):
+                            in_step[field[i, j].private[0] - 1] += 2
+                            field[i, j].private[1].doxod += 2
                 clear_cell_info()
 
             can_spawn = isinstance(last, Cell) and isinstance(last.building, City)
@@ -349,7 +353,7 @@ while run_app:
                 cur_money[field.player - 1] -= 7
             if event.type == pygame.KEYDOWN and event.key == pygame.K_r and last.unit and \
                     last.unit.player == field.player and (
-                    isinstance(last.building, Village) or isinstance(last.building, City)) and\
+                    isinstance(last.building, Village) or isinstance(last.building, City)) and \
                     last.building.is_capture:
                 if isinstance(last.building, City):
                     last.building.pl = field.player
@@ -366,17 +370,16 @@ while run_app:
                     in_step[field.player - 1] += 2
                     last.unit.set_use(False)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_m and not last.building and \
-                last.private and last.private[0] == field.player and \
-                    cur_money[field.player-1] >= 20 and last.typ in 'gcs':
+                    last.private and last.private[0] == field.player and \
+                    cur_money[field.player - 1] >= 20 and last.typ in 'gcs':
                 last.set_building(WindMill(in_step, field.player, last.x, last.y, field))
                 cur_money[field.player - 1] -= 20
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_l and not last.building and \
-                    last.private and last.private[0] == field.player and cur_money[
-                field.player - 1] >= 15 and last.typ in 'gcs':
+                    last.private and last.private[0] == field.player and \
+                    cur_money[field.player - 1] >= 15 and last.typ in 'gcs':
                 last.set_building(LumberHut(in_step, field.player, last.x, last.y, field))
                 cur_money[field.player - 1] -= 15
-
 
         print_balance(field.player)
         if in_step[0] == 0:
