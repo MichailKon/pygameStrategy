@@ -430,3 +430,4 @@ while run_app:
                 exit()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                 local_run = 0
+pygame.quit()
