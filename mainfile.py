@@ -347,7 +347,7 @@ while run_app:
                 del_all_selection()
                 last.building.count_of_units += 1
                 cur_money[field.player - 1] -= 7
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_r and\
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_r and last.unit and \
                     last.unit.player == field.player and (
                     isinstance(last.building, Village) or isinstance(last.building, City)) and\
                     last.building.is_capture:
@@ -380,7 +380,47 @@ while run_app:
 
         print_balance(field.player)
         if in_step[0] == 0:
-            run_game = -1
-        elif in_step[1] == 0:
             run_game = -2
+        elif in_step[1] == 0:
+            run_game = -1
         pygame.display.flip()
+
+    if -run_game == FIRST_PLAYER:
+        win_image = load_image('win_black.png')
+        font = pygame.font.Font(None, 60)
+        text_coord = 200
+        sc.blit(win_image, (0, 0))
+        ans = [f'The first player won by scoring {in_step[0]} points per turn',
+               f'                           Play again?']
+        for i in ans:
+            string_rendered = font.render(i, True, pygame.Color('blue'))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 25
+            text_coord += intro_rect.height
+            sc.blit(string_rendered, intro_rect)
+    elif -run_game == SECOND_PLAYER:
+        win_image = load_image('win_black.png')
+        font = pygame.font.Font(None, 60)
+        text_coord = 200
+        sc.blit(win_image, (0, 0))
+        ans = [f'The second player won by scoring {in_step[1]} points per turn',
+               f'                           Play again?']
+        for i in ans:
+            string_rendered = font.render(i, True, pygame.Color('blue'))
+            intro_rect = string_rendered.get_rect()
+            text_coord += 10
+            intro_rect.top = text_coord
+            intro_rect.x = 25
+            text_coord += intro_rect.height
+            sc.blit(string_rendered, intro_rect)
+
+    local_run = 1
+    while local_run:
+        pygame.display.update()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                exit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                local_run = 0

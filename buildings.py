@@ -90,7 +90,7 @@ class Village(_BaseCity):
         self.cell.set_building(nan)
         for i in range(self.x - 1, self.x + 2):
             for j in range(self.y - 1, self.y + 2):
-                if 0 <= i <= 10 and 0 <= j <= 10:
+                if 0 <= i < 10 and 0 <= j < 10:
                     if self.field[(i, j)].private == 0:
                         self.field[(i, j)].set_private([pl, nan])
 
@@ -112,7 +112,7 @@ class LumberHut(_BaseCity):
         super().__init__(x, y, field, 'lumberhut.png', colorkey=-1)
         for i in range(x - 1, x + 2):
             for j in range(y - 1, y + 2):
-                if 0 <= i <= 10 and 0 <= j <= 10 and isinstance(self.field[(i, j)].building, Forest):
+                if 0 <= i < 10 and 0 <= j < 10 and isinstance(self.field[(i, j)].building, Forest):
                     in_step[player - 1] += 1
                     field[x, y].private[1].doxod += 1
 
@@ -122,7 +122,7 @@ class WindMill(_BaseCity):
         super().__init__(x, y, field, 'windmill.png')
         for i in range(x - 1, x + 2):
             for j in range(y - 1, y + 2):
-                if 0 <= i <= 10 and 0 <= j <= 10 and isinstance(self.field[(i, j)].building, WheatFields) and \
+                if 0 <= i < 10 and 0 <= j < 10 and isinstance(self.field[(i, j)].building, WheatFields) and \
                         self.field[i, j].building.worked:
                     in_step[player - 1] += 2
                     field[x, y].private[1].doxod += 2
