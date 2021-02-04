@@ -168,11 +168,5 @@ class ShieldMan(_BaseUnit):
                          potential_second_attack=7, defense=0.3, city=city)
 
 
-if __name__ == '__main__':
-    import pygame
 
-    pygame.init()
-    sc = pygame.display.set_mode((800, 700))
 
-    a = Archer(0, 0)
-    print(a.img_size)

@@ -184,7 +184,7 @@ while run_app:
     run_game = 1
     in_step = [0, 0]
     cur_money = [5, 5]
-    field = Field(10, sc, in_step, god_mode=1)
+    field = Field(10, sc, in_step)
     field.debug_print()
 
     last = None
@@ -415,6 +415,8 @@ while run_app:
             intro_rect.x = 25
             text_coord += intro_rect.height
             sc.blit(string_rendered, intro_rect)
+    else:
+        continue
 
     local_run = 1
     while local_run:
