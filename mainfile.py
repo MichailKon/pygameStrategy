@@ -159,6 +159,7 @@ def draw_borders():
 
 
 pygame.init()
+pygame.display.set_caption('Half-battle of Polytopia')
 sc = pygame.display.set_mode((1000, 10 * 64))
 fon_img = load_image('fon.png')
 skip_img = load_image('skip.png')
@@ -184,7 +185,7 @@ while run_app:
     run_game = 1
     in_step = [0, 0]
     cur_money = [5, 5]
-    field = Field(10, sc, in_step)
+    field = Field(10, sc, in_step, god_mode=0)
 
     pygame.mixer.music.load(os.path.join('data', 'music', 'main_music.mp3'))
     pygame.mixer.music.play()
