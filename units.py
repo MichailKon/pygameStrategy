@@ -1,5 +1,5 @@
 from constants import FIRST_PLAYER, SECOND_PLAYER
-from useful_funcs import load_image, change_color, copy_class
+from useful_funcs import load_image, change_color
 from pygame import Color, Surface, BLEND_RGBA_MULT
 
 
@@ -41,8 +41,8 @@ class _BaseUnit(object):
             return False
         first = abs(x - self._pos_x)
         second = abs(y - self._pos_y)
-        return self.field[x, y].unit is not None and self.field[x, y].unit.player != self.player and \
-               max(first, second) <= self._attack_range and not isinstance(self, JesusChrist)
+        tmp = max(first, second) <= self._attack_range and not isinstance(self, JesusChrist)
+        return self.field[x, y].unit is not None and self.field[x, y].unit.player != self.player and tmp
 
     def check_energy(self):
         if not self._can_use or not self._can_walk:
@@ -83,7 +83,8 @@ class _BaseUnit(object):
             enemy.get_damage(self._attack_func(self._hp, self._max_hp, self._attack))
         else:
             enemy.get_damage(self._attack_func(self._hp, self._max_hp, self._second_attack))
-        if not enemy.is_alive() and not second_strike and not isinstance(self, Archer) and not isinstance(enemy, JesusChrist):
+        if not enemy.is_alive() and not second_strike and not isinstance(self, Archer) and not isinstance(enemy,
+                                                                                                          JesusChrist):
             self.move(x, y)
             return
         elif not enemy.is_alive():
@@ -151,7 +152,7 @@ class Warrior(_BaseUnit):
 
 
 class Archer(_BaseUnit):
-    def __init__(self, field, x, y, player=1):
+    def __init__(self, field, x, y, player=1, city=None):
         super().__init__(field, x, y, attack_range=2,
                          player=player, hp=10, energy=1, image_name='archer.png', city=city)
 
@@ -166,7 +167,3 @@ class ShieldMan(_BaseUnit):
     def __init__(self, field, x, y, player=1, city=None):
         super().__init__(field, x, y, player=player, image_name='shield_man.png', potential_attack=3,
                          potential_second_attack=7, defense=0.3, city=city)
-
-
-
-

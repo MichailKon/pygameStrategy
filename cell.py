@@ -12,8 +12,9 @@ class Cell:
                        'd1': load_image('down.png', colorkey=-1)}
 
         self._image.update({'l2': load_image('left1.png', colorkey=-1),
-                       'r2': load_image('right1.png', colorkey=-1), 'u2': load_image('up1.png', colorkey=-1),
-                       'd2': load_image('down1.png', colorkey=-1)})
+                            'r2': load_image('right1.png', colorkey=-1),
+                            'u2': load_image('up1.png', colorkey=-1),
+                            'd2': load_image('down1.png', colorkey=-1)})
         self.select = None
         self.sel_move = load_image('blue_target.png', colorkey=-1)
         self.sel_target = load_image('red_target.png', colorkey=-1)
