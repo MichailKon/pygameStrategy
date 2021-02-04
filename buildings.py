@@ -62,7 +62,8 @@ class City(_BaseCity):
         return self.level
 
     def spawn_unit(self, unit):
-        self.cell.set_unit(unit)
+        if not self.cell.unit:
+            self.cell.set_unit(unit)
 
     def update(self, in_step):
         in_step[self.pl - 1] += 1
