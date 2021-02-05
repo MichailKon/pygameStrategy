@@ -352,7 +352,7 @@ while run_app:
                 del_all_selection()
                 last.building.count_of_units += 1
                 cur_money[field.player - 1] -= 7
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_r and last.unit and \
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_r and last and last.unit and \
                     last.unit.player == field.player and (
                     isinstance(last.building, Village) or isinstance(last.building, City)) and \
                     last.building.is_capture:
@@ -370,13 +370,13 @@ while run_app:
                     last.set_building(City(last.unit.player, last.x, last.y, field))
                     in_step[field.player - 1] += 2
                     last.unit.set_use(False)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_m and not last.building and \
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_m and last and not last.building and \
                     last.private and last.private[0] == field.player and \
                     cur_money[field.player - 1] >= 20 and last.typ in 'gcs':
                 last.set_building(WindMill(in_step, field.player, last.x, last.y, field))
                 cur_money[field.player - 1] -= 20
 
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_l and not last.building and \
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_l and last and not last.building and \
                     last.private and last.private[0] == field.player and \
                     cur_money[field.player - 1] >= 15 and last.typ in 'gcs':
                 last.set_building(LumberHut(in_step, field.player, last.x, last.y, field))
