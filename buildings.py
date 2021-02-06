@@ -1,6 +1,6 @@
 import units
 from constants import FIRST_PLAYER, SECOND_PLAYER
-from useful_funcs import load_image, change_color
+from useful_funcs import load_image, change_color, check_in_rect
 from pygame import Color
 
 
@@ -32,7 +32,7 @@ class City(_BaseCity):
     def make_private(self, len1, len2):
         for i in range(self.x - len1, self.x + len2 + 1):
             for j in range(self.y - len1, self.y + len2 + 1):
-                if 0 <= i < self.field.sz and 0 <= j < self.field.sz:
+                if check_in_rect(i, j):
                     if not self.field[(i, j)].private:
                         self.field[(i, j)].set_private([self.pl, self])
                     self.field[i, j].set_visible(self.field[i, j].visible
@@ -62,7 +62,7 @@ class City(_BaseCity):
         return self.level
 
     def spawn_unit(self, unit):
-        if not self.cell.unit:
+        if not self.cell.unit or self.cell.unit.player == self.pl:
             self.cell.set_unit(unit)
 
     def update(self, in_step):
@@ -90,7 +90,7 @@ class Village(_BaseCity):
         self.cell.set_building(nan)
         for i in range(self.x - 1, self.x + 2):
             for j in range(self.y - 1, self.y + 2):
-                if 0 <= i < 10 and 0 <= j < 10:
+                if check_in_rect(i, j):
                     if self.field[(i, j)].private == 0:
                         self.field[(i, j)].set_private([pl, nan])
 
@@ -112,7 +112,7 @@ class LumberHut(_BaseCity):
         super().__init__(x, y, field, 'lumberhut.png', colorkey=-1)
         for i in range(x - 1, x + 2):
             for j in range(y - 1, y + 2):
-                if 0 <= i < 10 and 0 <= j < 10 and isinstance(self.field[(i, j)].building, Forest):
+                if check_in_rect(i, j) and isinstance(self.field[(i, j)].building, Forest):
                     in_step[player - 1] += 1
                     field[x, y].private[1].doxod += 1
 
@@ -122,7 +122,7 @@ class WindMill(_BaseCity):
         super().__init__(x, y, field, 'windmill.png')
         for i in range(x - 1, x + 2):
             for j in range(y - 1, y + 2):
-                if 0 <= i < 10 and 0 <= j < 10 and isinstance(self.field[(i, j)].building, WheatFields) and \
+                if check_in_rect(i, j) and isinstance(self.field[(i, j)].building, WheatFields) and \
                         self.field[i, j].building.worked:
                     in_step[player - 1] += 2
                     field[x, y].private[1].doxod += 2

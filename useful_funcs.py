@@ -1,5 +1,6 @@
 import os
 import sys
+from constants import FIELD_SIZE
 
 import pygame
 
@@ -26,3 +27,7 @@ def change_color(image, color, find=(0, 0, 0)):
     img.fill(color, None, pygame.BLEND_RGB_ADD)
 
     return img
+
+
+def check_in_rect(i, j, x1=0, y1=0, x2=FIELD_SIZE, y2=FIELD_SIZE):
+    return x1 <= i < x2 and y1 <= j < y2

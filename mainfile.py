@@ -7,7 +7,8 @@ from board import Field
 from buildings import *
 from cell import Cell
 from constants import CELL_SIZE, SKIP_BUTTON_X, SKIP_BUTTON_Y, SKIP_BUTTON_WIDTH, SKIP_BUTTON_HEIGHT, \
-    FIELD_ROWS, FIELD_COLUMNS
+    FIELD_SIZE
+from useful_funcs import check_in_rect
 from units import *
 
 
@@ -159,10 +160,6 @@ def draw_borders():
                         sc.blit(field[i, j].im['u2'], (i * CELL_SIZE, j * CELL_SIZE))
 
 
-def check_in_rect(i, j):
-    return 0 <= i < FIELD_ROWS and 0 <= j <= FIELD_COLUMNS
-
-
 def make_next_move():
     field.next_move(cur_money, in_step)
     del_all_selection()
@@ -175,7 +172,7 @@ def make_next_move():
                     field[i, j].set_building(Forest(i, j, field))
                     for k in range(i - 1, i + 2):
                         for l in range(j - 1, j + 2):
-                            if 0 <= k < 10 and 0 <= l < 10 and isinstance(field[k, l].building, LumberHut):
+                            if check_in_rect(k, l) and isinstance(field[k, l].building, LumberHut):
                                 in_step[field[k, l].private[0] - 1] += 1
                                 field[k, l].private[1].doxod += 1
             if field[i, j].unit and (
@@ -202,7 +199,7 @@ def game_end(text_coord, ans):
 
 pygame.init()
 pygame.display.set_caption('Half-battle of Polytopia')
-sc = pygame.display.set_mode((1000, FIELD_ROWS * CELL_SIZE))
+sc = pygame.display.set_mode((1000, FIELD_SIZE * CELL_SIZE))
 fon_img = load_image('fon.png')
 skip_img = load_image('skip.png')
 
@@ -227,7 +224,7 @@ while run_app:
     run_game = 1
     in_step = [0, 0]
     cur_money = [5, 5]
-    field = Field(10, sc, in_step, god_mode=0)
+    field = Field(FIELD_SIZE, sc, in_step, cell_size=CELL_SIZE, god_mode=0)
 
     pygame.mixer.music.load(os.path.join('data', 'music', 'main_music.mp3'))
     pygame.mixer.music.play()
@@ -248,7 +245,7 @@ while run_app:
                 make_next_move()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
-                if -SKIP_BUTTON_WIDTH <= x - SKIP_BUTTON_X <= 0 and -SKIP_BUTTON_HEIGHT <= y - SKIP_BUTTON_Y <= 0:
+                if check_in_rect(x - SKIP_BUTTON_X, y - SKIP_BUTTON_Y, -SKIP_BUTTON_WIDTH, -SKIP_BUTTON_HEIGHT, 0, 0):
                     make_next_move()
                 else:
                     cell = field.get_click(event.pos)
