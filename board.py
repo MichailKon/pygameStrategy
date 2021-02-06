@@ -6,6 +6,7 @@ import noise
 from buildings import *
 from cell import Cell
 from constants import CELL_TYPES, FIRST_PLAYER, SECOND_PLAYER
+from useful_funcs import check_in_rect
 
 
 class Field:
@@ -27,10 +28,10 @@ class Field:
 
         return field
 
-    def __init__(self, size, screen, in_step, god_mode=0):
+    def __init__(self, size, screen, in_step, cell_size, god_mode=0):
         self.sc = screen
         self.sz = size
-        self.cell_size = 64
+        self.cell_size = cell_size
         self.short_matrix = self.generate_field(size)
         self.long_matrix = [[Cell() for i in range(size)] for i in range(size)]
         for i in range(size):
@@ -70,7 +71,7 @@ class Field:
                 for dx in range(-1, 2):
                     for dy in range(-1, 2):
                         x1, y1 = x + dx, y + dy
-                        if 0 <= x1 < self.sz and 0 <= y1 < self.sz and \
+                        if check_in_rect(x1, y1, x2=self.sz, y2=self.sz) and \
                                 (isinstance(self.long_matrix[x1][y1].building, City) or
                                  isinstance(self.long_matrix[x1][y1].building, Village)):
                             castle_near = True
@@ -94,7 +95,7 @@ class Field:
                 for dx in range(-2, 3):
                     for dy in range(-2, 3):
                         x1, y1 = x + dx, y + dy
-                        if 0 <= x1 < self.sz and 0 <= y1 < self.sz and \
+                        if check_in_rect(x1, y1, x2=self.sz, y2=self.sz) and \
                                 (isinstance(self.long_matrix[x1][y1].building, City) or
                                  isinstance(self.long_matrix[x1][y1].building, Village)):
                             castle_near = True
@@ -137,7 +138,7 @@ class Field:
         try:
             x = mouse_pos[1] // self.cell_size
             y = mouse_pos[0] // self.cell_size
-            if not (0 <= x < self.sz) or not (0 <= y < self.sz):
+            if not check_in_rect(x, y, x2=self.sz, y2=self.sz):
                 return None
         except IndexError:
             print('Что-то не так с mousePos')

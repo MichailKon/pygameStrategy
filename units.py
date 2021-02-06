@@ -1,5 +1,5 @@
 from constants import FIRST_PLAYER, SECOND_PLAYER
-from useful_funcs import load_image, change_color
+from useful_funcs import load_image, change_color, check_in_rect
 from pygame import Color, Surface, BLEND_RGBA_MULT
 
 
@@ -68,7 +68,7 @@ class _BaseUnit(object):
         self.field[old_x, old_y].set_unit(None)
         for i in range(self.pos_x - 1, self.pos_x + 1 + 1):
             for j in range(self.pos_y - 1, self.pos_y + 1 + 1):
-                if 0 <= i < self.field.sz and 0 <= j < self.field.sz:
+                if check_in_rect(i, j):
                     self.field[i, j].set_visible(self.field[i, j].visible
                                                  | ((1 << FIRST_PLAYER) if self.field.player == FIRST_PLAYER
                                                     else (1 << SECOND_PLAYER)))
