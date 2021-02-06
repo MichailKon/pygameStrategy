@@ -24,7 +24,7 @@ class City(_BaseCity):
         self.is_capture = False
         self.make_private(1, 1)
         if start_city:
-            self.spawn_unit(units.Warrior(field, x, y, player=player))
+            self.spawn_unit(units.Warrior(field, x, y, player=player, city=self))
         self.img = change_color(self.img, Color('white'))
         self.max_units_count = 3 * self.level - 1
         self.count_of_units = 1 if start_city else 0
