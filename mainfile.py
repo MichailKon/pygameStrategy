@@ -6,11 +6,13 @@ import pygame
 from board import Field
 from buildings import *
 from cell import Cell
+from constants import CELL_SIZE, SKIP_BUTTON_X, SKIP_BUTTON_Y, SKIP_BUTTON_WIDTH, SKIP_BUTTON_HEIGHT, \
+    FIELD_ROWS, FIELD_COLUMNS
 from units import *
 
 
 def clear_cell_info():
-    pygame.draw.rect(sc, pygame.Color('grey'), (10 * 64 + 10, 70, 300, 400))
+    pygame.draw.rect(sc, pygame.Color('grey'), (10 * CELL_SIZE + 10, 70, 300, 400))
 
 
 def get_cell_info(cell: Cell, player):
@@ -18,7 +20,6 @@ def get_cell_info(cell: Cell, player):
         return []
     clear_cell_info()
     if not cell.visible & (1 << player):
-        print(cell.visible)
         return [f'Cell: {cell.x, cell.y}', 'Cell type: fog']
     ans = [f'Cell coords: {cell.x, cell.y}',
            f'Cell type: {dict([("w", "water"), ("g", "grass"), ("s", "sand"), ("c", "climbs")])[cell.typ]}']
@@ -45,7 +46,7 @@ def print_cell_info(cell: Cell):
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
-        intro_rect.x = 10 * 64 + 10
+        intro_rect.x = 10 * CELL_SIZE + 10
         text_coord += intro_rect.height
         sc.blit(string_rendered, intro_rect)
 
@@ -56,13 +57,13 @@ def print_balance(player):
     font = pygame.font.Font(None, 30)
     text_coord = 10
     pygame.draw.rect(sc, 'grey',
-                     (10 * 64 + 10, 0, 200, 70))
+                     (10 * CELL_SIZE + 10, 0, 200, 70))
     for i in ans:
         string_rendered = font.render(i, True, pygame.Color('red'))
         intro_rect = string_rendered.get_rect()
         text_coord += 10
         intro_rect.top = text_coord
-        intro_rect.x = 10 * 64 + 10
+        intro_rect.x = 10 * CELL_SIZE + 10
         text_coord += intro_rect.height
         sc.blit(string_rendered, intro_rect)
 
@@ -89,22 +90,22 @@ def draw_borders():
                 p = field[i, j].private[0]
                 if p == 1:
                     if i == 0:
-                        sc.blit(field[i, j].im['l1'], (i * 64, j * 64))
+                        sc.blit(field[i, j].im['l1'], (i * CELL_SIZE, j * CELL_SIZE))
                     if j == 0:
-                        sc.blit(field[i, j].im['u1'], (i * 64, j * 64))
+                        sc.blit(field[i, j].im['u1'], (i * CELL_SIZE, j * CELL_SIZE))
                     if i == field.sz - 1:
-                        sc.blit(field[i, j].im['r1'], (i * 64, j * 64))
+                        sc.blit(field[i, j].im['r1'], (i * CELL_SIZE, j * CELL_SIZE))
                     if j == field.sz - 1:
-                        sc.blit(field[i, j].im['d1'], (i * 64, j * 64))
+                        sc.blit(field[i, j].im['d1'], (i * CELL_SIZE, j * CELL_SIZE))
                 else:
                     if i == 0:
-                        sc.blit(field[i, j].im['l2'], (i * 64, j * 64))
+                        sc.blit(field[i, j].im['l2'], (i * CELL_SIZE, j * CELL_SIZE))
                     if j == 0:
-                        sc.blit(field[i, j].im['u2'], (i * 64, j * 64))
+                        sc.blit(field[i, j].im['u2'], (i * CELL_SIZE, j * CELL_SIZE))
                     if i == field.sz - 1:
-                        sc.blit(field[i, j].im['r2'], (i * 64, j * 64))
+                        sc.blit(field[i, j].im['r2'], (i * CELL_SIZE, j * CELL_SIZE))
                     if j == field.sz - 1:
-                        sc.blit(field[i, j].im['d2'], (i * 64, j * 64))
+                        sc.blit(field[i, j].im['d2'], (i * CELL_SIZE, j * CELL_SIZE))
     for i in range(field.sz - 1):
         for j in range(field.sz):
             if not field[i, j].visible & (1 << field.player):
@@ -113,10 +114,10 @@ def draw_borders():
                 p = field[i, j].private[0]
                 if p == 1:
                     if not field[i + 1, j].private or field[i + 1, j].private[0] != 1:
-                        sc.blit(field[i, j].im['r1'], (i * 64, j * 64))
+                        sc.blit(field[i, j].im['r1'], (i * CELL_SIZE, j * CELL_SIZE))
                 else:
                     if not field[i + 1, j].private or field[i + 1, j].private[0] != 2:
-                        sc.blit(field[i, j].im['r2'], (i * 64, j * 64))
+                        sc.blit(field[i, j].im['r2'], (i * CELL_SIZE, j * CELL_SIZE))
 
     for i in range(field.sz):
         for j in range(field.sz - 1):
@@ -126,10 +127,10 @@ def draw_borders():
                 p = field[i, j].private[0]
                 if p == 1:
                     if not field[i, j + 1].private or field[i, j + 1].private[0] != 1:
-                        sc.blit(field[i, j + 1].im['d1'], (i * 64, j * 64))
+                        sc.blit(field[i, j + 1].im['d1'], (i * CELL_SIZE, j * CELL_SIZE))
                 else:
                     if not field[i, j + 1].private or field[i, j + 1].private[0] != 2:
-                        sc.blit(field[i, j].im['d2'], (i * 64, j * 64))
+                        sc.blit(field[i, j].im['d2'], (i * CELL_SIZE, j * CELL_SIZE))
 
     for i in range(1, field.sz):
         for j in range(field.sz):
@@ -139,10 +140,10 @@ def draw_borders():
                 p = field[i, j].private[0]
                 if p == 1:
                     if not field[i - 1, j].private or field[i - 1, j].private[0] != 1:
-                        sc.blit(field[i, j].im['l1'], (i * 64, j * 64))
+                        sc.blit(field[i, j].im['l1'], (i * CELL_SIZE, j * CELL_SIZE))
                 else:
                     if not field[i - 1, j].private or field[i - 1, j].private[0] != 2:
-                        sc.blit(field[i, j].im['l2'], (i * 64, j * 64))
+                        sc.blit(field[i, j].im['l2'], (i * CELL_SIZE, j * CELL_SIZE))
 
     for i in range(field.sz):
         for j in range(1, field.sz):
@@ -152,15 +153,56 @@ def draw_borders():
                 p = field[i, j].private[0]
                 if p == 1:
                     if not field[i, j - 1].private or field[i, j - 1].private[0] != 1:
-                        sc.blit(field[i, j - 1].im['u1'], (i * 64, j * 64))
+                        sc.blit(field[i, j - 1].im['u1'], (i * CELL_SIZE, j * CELL_SIZE))
                 else:
                     if not field[i, j - 1].private or field[i, j - 1].private[0] != 2:
-                        sc.blit(field[i, j].im['u2'], (i * 64, j * 64))
+                        sc.blit(field[i, j].im['u2'], (i * CELL_SIZE, j * CELL_SIZE))
+
+
+def check_in_rect(i, j):
+    return 0 <= i < FIELD_ROWS and 0 <= j <= FIELD_COLUMNS
+
+
+def make_next_move():
+    field.next_move(cur_money, in_step)
+    del_all_selection()
+    del_all_capturing()
+    clear_cell_info()
+    for i in range(field.sz):
+        for j in range(field.sz):
+            if field[i, j].typ == 'g' and not field[i, j].building:
+                if random.randint(1, 20) == 1:
+                    field[i, j].set_building(Forest(i, j, field))
+                    for k in range(i - 1, i + 2):
+                        for l in range(j - 1, j + 2):
+                            if 0 <= k < 10 and 0 <= l < 10 and isinstance(field[k, l].building, LumberHut):
+                                in_step[field[k, l].private[0] - 1] += 1
+                                field[k, l].private[1].doxod += 1
+            if field[i, j].unit and (
+                    isinstance(field[i, j].building, City) and
+                    field[i, j].unit.player != field[i, j].building.pl or
+                    isinstance(field[i, j].building, Village)):
+                field[i, j].building.is_capture = True
+
+
+def game_end(text_coord, ans):
+    win_image = load_image('win_black.png')
+    font = pygame.font.Font(None, 60)
+    sc.blit(win_image, (0, 0))
+
+    for i in ans:
+        string_rendered = font.render(i, True, pygame.Color('blue'))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 25
+        text_coord += intro_rect.height
+        sc.blit(string_rendered, intro_rect)
 
 
 pygame.init()
 pygame.display.set_caption('Half-battle of Polytopia')
-sc = pygame.display.set_mode((1000, 10 * 64))
+sc = pygame.display.set_mode((1000, FIELD_ROWS * CELL_SIZE))
 fon_img = load_image('fon.png')
 skip_img = load_image('skip.png')
 
@@ -194,7 +236,7 @@ while run_app:
     while run_game > 0 and run_app:
         field.draw()
         draw_borders()
-        sc.blit(skip_img, (1000 - 162, 640 - 40))
+        sc.blit(skip_img, (SKIP_BUTTON_X - SKIP_BUTTON_WIDTH, SKIP_BUTTON_Y - SKIP_BUTTON_HEIGHT))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run_app = 0
@@ -203,50 +245,11 @@ while run_app:
                 run_game = 0
             if event.type == pygame.KEYDOWN and \
                     event.key == pygame.K_RETURN:
-                field.next_move(cur_money, in_step)
-                del_all_selection()
-                del_all_capturing()
-                clear_cell_info()
-                last = None
-                for i in range(field.sz):
-                    for j in range(field.sz):
-                        if field[i, j].typ == 'g' and not field[i, j].building:
-                            if random.randint(1, 20) == 1:
-                                field[i, j].set_building(Forest(i, j, field))
-                                for k in range(i - 1, i + 2):
-                                    for l in range(j - 1, j + 2):
-                                        if 0 <= k < 10 and 0 <= l < 10 and isinstance(field[k, l].building, LumberHut):
-                                            in_step[field[k, l].private[0] - 1] += 1
-                                            field[k, l].private[1].doxod += 1
-                        if field[i, j].unit and (
-                                isinstance(field[i, j].building, City) and
-                                field[i, j].unit.player != field[i, j].building.pl or
-                                isinstance(field[i, j].building, Village)):
-                            field[i, j].building.is_capture = True
+                make_next_move()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 x, y = event.pos
-                if -162 <= x - 1000 <= 0 and -40 <= y - 640 <= 0:
-                    field.next_move(cur_money, in_step)
-                    del_all_selection()
-                    del_all_capturing()
-                    clear_cell_info()
-                    last = None
-                    for i in range(field.sz):
-                        for j in range(field.sz):
-                            if field[i, j].typ == 'g' and not field[i, j].building:
-                                if random.randint(1, 20) == 1:
-                                    field[i, j].set_building(Forest(i, j, field))
-                                    for k in range(i - 1, i + 2):
-                                        for l in range(j - 1, j + 2):
-                                            if 0 <= k < 10 and 0 <= l < 10 and isinstance(field[k, l].building,
-                                                                                          LumberHut):
-                                                in_step[field[k, l].private[0] - 1] += 1
-                                                field[k, l].private[1].doxod += 1
-                            if field[i, j].unit and (
-                                    isinstance(field[i, j].building, City) and
-                                    field[i, j].unit.player != field[i, j].building.pl or
-                                    isinstance(field[i, j].building, Village)):
-                                field[i, j].building.is_capture = True
+                if -SKIP_BUTTON_WIDTH <= x - SKIP_BUTTON_X <= 0 and -SKIP_BUTTON_HEIGHT <= y - SKIP_BUTTON_Y <= 0:
+                    make_next_move()
                 else:
                     cell = field.get_click(event.pos)
                     if cell is not None:
@@ -300,7 +303,7 @@ while run_app:
                     last.private and last.private[0] == field.player and cur_money[field.player - 1] >= 2:
                 for i in range(last.x - 1, last.x + 2):
                     for j in range(last.y - 1, last.y + 2):
-                        if 0 <= i < 10 and 0 <= j < 10 and isinstance(field[i, j].building, LumberHut):
+                        if check_in_rect(i, j) and isinstance(field[i, j].building, LumberHut):
                             in_step[field[i, j].private[0] - 1] -= 1
                             field[i, j].private[1].doxod -= 1
                 last.building.cut_down(in_step, cur_money)
@@ -311,7 +314,7 @@ while run_app:
                 last.building.plough(in_step, cur_money)
                 for i in range(last.x - 1, last.x + 2):
                     for j in range(last.y - 1, last.y + 2):
-                        if 0 <= i < 10 and 0 <= j < 10 and isinstance(field[i, j].building, WindMill):
+                        if check_in_rect(i, j) and isinstance(field[i, j].building, WindMill):
                             in_step[field[i, j].private[0] - 1] += 2
                             field[i, j].private[1].doxod += 2
                 clear_cell_info()
@@ -323,8 +326,7 @@ while run_app:
             else:
                 can_spawn = False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_a and can_spawn and \
-                    cur_money[
-                        field.player - 1] >= 10 and last.building.current_level() >= 3 and \
+                    cur_money[field.player - 1] >= 10 and last.building.current_level() >= 3 and \
                     last.building.count_of_units < last.building.max_units_count:
                 new_unit = Archer(field, last.x, last.y, player=field.player, city=last.building)
                 new_unit.set_use(False)
@@ -333,8 +335,7 @@ while run_app:
                 last.building.count_of_units += 1
                 cur_money[field.player - 1] -= 10
             if event.type == pygame.KEYDOWN and event.key == pygame.K_w and can_spawn and \
-                    cur_money[
-                        field.player - 1] >= 5 and last.building.current_level() >= 1 and \
+                    cur_money[field.player - 1] >= 5 and last.building.current_level() >= 1 and \
                     last.building.count_of_units < last.building.max_units_count:
                 new_unit = Warrior(field, last.x, last.y, player=field.player, city=last.building)
                 new_unit.set_use(False)
@@ -390,35 +391,15 @@ while run_app:
         pygame.display.flip()
 
     if -run_game == FIRST_PLAYER:
-        win_image = load_image('win_black.png')
-        font = pygame.font.Font(None, 60)
         text_coord = 200
-        sc.blit(win_image, (0, 0))
         ans = [f'The first player won by scoring {in_step[0]} points per turn',
                f'                           Play again?']
-        for i in ans:
-            string_rendered = font.render(i, True, pygame.Color('blue'))
-            intro_rect = string_rendered.get_rect()
-            text_coord += 10
-            intro_rect.top = text_coord
-            intro_rect.x = 25
-            text_coord += intro_rect.height
-            sc.blit(string_rendered, intro_rect)
+        game_end(text_coord, ans)
     elif -run_game == SECOND_PLAYER:
-        win_image = load_image('win_black.png')
-        font = pygame.font.Font(None, 60)
         text_coord = 200
-        sc.blit(win_image, (0, 0))
         ans = [f'The second player won by scoring {in_step[1]} points per turn',
                f'                           Play again?']
-        for i in ans:
-            string_rendered = font.render(i, True, pygame.Color('blue'))
-            intro_rect = string_rendered.get_rect()
-            text_coord += 10
-            intro_rect.top = text_coord
-            intro_rect.x = 25
-            text_coord += intro_rect.height
-            sc.blit(string_rendered, intro_rect)
+        game_end(text_coord, ans)
     else:
         continue
 
